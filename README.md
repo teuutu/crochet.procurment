@@ -6,7 +6,7 @@ It demonstrates skills in database design, SQL analytics, and Python visualizati
 
 ---
 
-## 🛠 Features
+##  Features
 - Relational database schema for suppliers, categories, items, purchase orders, and order lines.
 - Sample data for crochet yarn purchases.
 - SQL queries for procurement classification and spend analysis.
