@@ -1,0 +1,33 @@
+import mysql.connector
+import pandas as pd
+import plt
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+conn = mysql.connector.connect(
+    host="localhost",   # or "127.0.0.1"
+    user="root",
+    password="Teodora12!",
+    database="crochet_procurment"
+)
+
+
+query = """
+SELECT s.name AS supplier, c.name AS category, i.name AS item,
+       pl.quantity, pl.unit_price, (pl.quantity * pl.unit_price) AS total_spend
+FROM po_lines pl
+JOIN items i ON pl.item_id = i.item_id
+JOIN categories c ON i.category_id = c.category_id
+JOIN suppliers s ON i.supplier_id = s.supplier_id;
+"""
+
+df = pd.read_sql(query, conn)
+category_summary = df.groupby('category')['total_spend'].sum().reset_index()
+
+
+sns.barplot(data=category_summary, x='category', y='total_spend')
+plt.show()
+
+plt.title('Spend by Yarn Category')
+plt.ylabel('EUR')
+plt.show()
