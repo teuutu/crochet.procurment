@@ -1,118 +1,95 @@
-# 🧶 Crochet Procurement Classification Project  
+# Crochet Procurement Classification Project  
 
-## 📌 Overview  
-This project explores **crochet spending analysis** using **MySQL 8.0** and **Python**, with a focus on yarn suppliers **Alize Burkum** and **YarnArt**.  
-It demonstrates expertise in:  
-- Relational database design  
-- SQL-based procurement classification and spend analysis  
-- Python-driven data visualization  
+## Overview  
+This project analyzes crochet yarn purchases using **MySQL 8.0.44** and **Python**, focusing on suppliers **Alize Burkum** and **YarnArt**.  
+It demonstrates skills in database design, SQL analytics, and Python visualization — blending engineering precision with creative flair.  
 
 ---
 
-## ✨ Features  
-- **Database schema** for suppliers, categories, items, purchase orders, and order lines  
-- **Sample dataset** of crochet yarn purchases  
-- **SQL queries** for procurement classification and supplier/category spend analysis  
-- **Python integration** with `pandas`, `seaborn`, and `matplotlib`  
-- **Visual insights** into supplier spend distribution and category-level trends  
+## Features  
+- Relational schema for suppliers, categories, items, purchase orders, and order lines  
+- Sample data for yarn purchases and supplier-country mapping  
+- SQL queries for procurement classification and spend analysis  
+- Python integration with `mysql-connector-python`, `pandas`, `seaborn`, and `matplotlib`  
+- Bar chart visualization of spend by yarn category  
 
 ---
 
-## 📂 Project Structure  
+## Files Included  
 ```
-crochet-procurement/
+crochet_procurement/
 │
-├── sql/                  # SQL scripts for schema & queries
-│   ├── schema.sql
-│   ├── sample_data.sql
-│   └── analysis_queries.sql
-│
-├── python/               # Python scripts for visualization
-│   ├── data_import.py
-│   ├── spend_analysis.py
-│   └── visualization.py
-│
-├── docs/                 # Documentation & diagrams
-│   ├── ER_diagram.png
-│   └── README.md
-│
-└── requirements.txt      # Python dependencies
+├── crochet_procurement.sql     # MySQL schema + sample data
+├── crochet_procurement.py      # Python script for querying and visualization
+├── requirements.txt            # Python dependencies
+└── README.md                   # Project documentation
 ```
 
 ---
 
-## 🛠️ Database Setup  
-1. Create the database:  
-   ```sql
-   CREATE DATABASE crochet_procurement;
-   USE crochet_procurement;
-   ```
-2. Import schema and sample data:  
-   ```sql
-   SOURCE sql/schema.sql;
-   SOURCE sql/sample_data.sql;
-   ```
+## Setup Instructions  
+
+### 1. MySQL Setup  
+Run the SQL dump to create and populate the database:  
+```sql
+SOURCE crochet_procurement.sql;
+```
+
+### 2. Python Environment  
+Install dependencies:  
+```bash
+pip install -r requirements.txt
+```
+
+Contents of `requirements.txt`:  
+```
+mysql-connector-python==8.0.33
+pandas==2.1.4
+matplotlib==3.8.2
+seaborn==0.13.0
+```
 
 ---
 
-## 📊 Example Analyses  
-- **Supplier Spend Breakdown**  
-  ```sql
-  SELECT supplier_name, SUM(order_line_total) AS total_spend
-  FROM suppliers
-  JOIN purchase_orders USING(supplier_id)
-  JOIN order_lines USING(order_id)
-  GROUP BY supplier_name;
-  ```
-- **Category Spend Visualization (Python)**  
-  ```python
-  import pandas as pd
-  import seaborn as sns
-  import matplotlib.pyplot as plt
+## 📊 Python Analysis  
+The Python script connects to MySQL, runs a join query across five tables, and visualizes total spend per yarn category:
 
-  df = pd.read_csv("procurement_data.csv")
-  sns.barplot(x="category", y="spend", data=df)
-  plt.title("Category Spend Analysis")
-  plt.show()
-  ```
+```python
+import mysql.connector
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
----
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="Teodora12!",
+    database="crochet_procurement"
+)
 
-## 📈 Visual Insights  
-- Supplier spend comparison (Alize Burkum vs YarnArt)  
-- Category-level procurement trends  
-- Time-series analysis of purchase orders  
+query = """
+SELECT s.name AS supplier, c.name AS category, i.name AS item,
+       pl.quantity, pl.unit_price, (pl.quantity * pl.unit_price) AS total_spend
+FROM po_lines pl
+JOIN items i ON pl.item_id = i.item_id
+JOIN categories c ON i.category_id = c.category_id
+JOIN suppliers s ON i.supplier_id = s.supplier_id;
+"""
 
----
+df = pd.read_sql(query, conn)
+category_summary = df.groupby('category')['total_spend'].sum().reset_index()
 
-## 🚀 How to Run  
-1. Install dependencies:  
-   ```bash
-   pip install -r requirements.txt
-   ```
-2. Run SQL scripts in MySQL 8.0.  
-3. Execute Python scripts for analysis and visualization:  
-   ```bash
-   python python/spend_analysis.py
-   ```
+sns.barplot(data=category_summary, x='category', y='total_spend')
+plt.title('Spend by Yarn Category')
+plt.ylabel('EUR')
+plt.show()
+```
 
 ---
 
-## 🎯 Skills Demonstrated  
-- **Database Design**: Normalized schema with relational integrity  
-- **SQL Analytics**: Procurement classification, supplier/category spend queries  
-- **Python Visualization**: Clear, insightful charts using `seaborn` and `matplotlib`  
-- **Integration**: End-to-end workflow combining SQL and Python  
+## Future Implementation Ideas  
+- Add time-series analysis for monthly spend  
+- Expand supplier list and item categories  
+- Build interactive dashboards with Streamlit or Plotly  
 
 ---
-
-## 📌 Future Improvements  
-- Add more suppliers and categories for broader analysis  
-- Automate ETL pipeline for real-time procurement data  
-- Deploy interactive dashboards with **Plotly** or **Streamlit**  
-
----
-
-This version makes your README more professional, structured, and portfolio-ready. It highlights your technical and creative strengths while guiding readers through setup and usage.  
-
-👉 Do you want me to also design a **visual ER diagram** and include it in your README so it looks even more polished?
